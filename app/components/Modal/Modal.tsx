@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
-import {IoMdClose} from "react-icons/io"
+import { IoMdClose } from "react-icons/io";
+import Button from "../Button";
 interface ModalProps {
     isOpen?: boolean;
     onClose: () => void;
@@ -11,7 +12,7 @@ interface ModalProps {
     actionLabel: string;
     disabled?: boolean;
     secondaryAction?: () => void;
-    secondaryLabel?: string;
+    secondaryActionLabel?: string;
 }
 const Modal: React.FC<ModalProps> = ({
     isOpen,
@@ -23,7 +24,7 @@ const Modal: React.FC<ModalProps> = ({
     actionLabel,
     disabled,
     secondaryAction,
-    secondaryLabel,
+    secondaryActionLabel,
 }) => {
     const [showModal, setShowModal] = useState(isOpen);
     useEffect(() => {
@@ -53,28 +54,48 @@ const Modal: React.FC<ModalProps> = ({
     return (
         <>
             <div className="fixed inset-0 flex items-center overflow-x-hidden overflow-y-auto outline-none justify-content focus:outline-none bg-neutral-800/70">
-                <div className="relative w-full h-full mx-auto my-6 md:w-4/6 lg:w-3/6 xl:w-2/5 lg:h-auto md:h-auto" >
-                    <div className={`translate duration-300 h-full 
-                        ${showModal ? "translate-y-0": "translate-y-full"}
-                        ${showModal ? "opacity-100": "opacity-0"}
-                    `} >
-
-                         <div className="relative flex flex-col w-full h-full bg-white border-0 rounded-lg shadow-lg outline-none translate lg:h-auto md:h-auto focus:outline-none">
+                <div className="relative w-full h-full mx-auto my-6 md:w-4/6 lg:w-3/6 xl:w-2/5 lg:h-auto md:h-auto">
+                    <div
+                        className={`translate duration-300 h-full 
+                        ${showModal ? "translate-y-0" : "translate-y-full"}
+                        ${showModal ? "opacity-100" : "opacity-0"}
+                    `}
+                    >
+                        <div className="relative flex flex-col w-full h-full bg-white border-0 rounded-lg shadow-lg outline-none translate lg:h-auto md:h-auto focus:outline-none">
                             <div className="relative flex items-center justify-center p-6 rounded-t border-b-[1px] ">
-                                <button onClick={handleClose} className="absolute p-1 transition border-0 hover:opacity-70 left-9">
+                                <button
+                                    onClick={handleClose}
+                                    className="absolute p-1 transition border-0 hover:opacity-70 left-9"
+                                >
                                     <IoMdClose size={18}></IoMdClose>
                                 </button>
                                 <div className="text-lg font-semibold">
                                     {title}
                                 </div>
                             </div>
-                            <div className="relative flex-auto p-6 ">{body}</div>
-                            <div className="flex flex-col gap-2 p-6">
-                                <div className="flex flex-row items-center w-full gap-4 ">
-                                    <Button/>
-                                </div>
+                            <div className="relative flex-auto p-6 ">
+                                {body}
                             </div>
-                         </div>
+                            <div className="flex flex-col gap-2 p-6">
+                                <div className="flex flex-row w-full gap-4 ">
+                                    {secondaryActionLabel &&
+                                        secondaryAction && (
+                                            <Button
+                                                outline
+                                                disabled={disabled}
+                                                label={secondaryActionLabel}
+                                                onClick={handleSecondaryAction}
+                                            />
+                                        )}
+                                    <Button
+                                        disabled={disabled}
+                                        label={actionLabel}
+                                        onClick={handleSubmit}
+                                    />
+                                </div>
+                                {footer}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
