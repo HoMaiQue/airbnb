@@ -1,24 +1,25 @@
 "use client";
-import { useRegisterModal } from "@/app/hooks";
-import React, { useCallback, useState } from "react";
-import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
-import Modal from "./Modal";
-import axios from "axios";
-import Heading from "../Heading";
-import Input from "../Input";
+import { useLoginModal } from "@/app/hooks/useLoginModal";
 import { Schema, schema } from "@/app/utils/rules";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "react-hot-toast";
-import Button from "../Button";
-import { FcGoogle} from "react-icons/fc";
-import { AiFillGithub } from "react-icons/ai";
 import { signIn } from "next-auth/react";
-import { useLoginModal } from "@/app/hooks/useLoginModal";
-type FormData = Pick<Schema, "email" | "name" | "password">;
-const registerSchema = schema.pick(["email", "name", "password"]);
-export default function RegisterModal() {
-    const registerModal = useRegisterModal();
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { AiFillGithub } from "react-icons/ai";
+import { FcGoogle } from "react-icons/fc";
+import Button from "../Button";
+import Heading from "../Heading";
+import Input from "../Input";
+import Modal from "./Modal";
+import { useRegisterModal } from "@/app/hooks";
+type FormData = Pick<Schema, "email" | "password">;
+const loginSchema = schema.pick(["email", "password"]);
+export default function LoginModal() {
+    const router = useRouter();
     const loginModal = useLoginModal();
+    const registerModal = useRegisterModal();
     const [isLoading, setLoading] = useState<boolean>(false);
 
     const {
@@ -26,8 +27,8 @@ export default function RegisterModal() {
         handleSubmit,
         formState: { errors },
     } = useForm<FormData>({
-        defaultValues: { name: "", email: "", password: "" },
-        resolver: yupResolver(registerSchema),
+        defaultValues: { email: "", password: "" },
+        resolver: yupResolver(loginSchema),
     });
 
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
@@ -38,25 +39,29 @@ export default function RegisterModal() {
         // } catch (error) {
         //     console.log(error);
         // }
-        axios
-            .post("/api/register", data)
-            .then(() => {
-                registerModal.onClose();
-            })
-            .catch((error) => {
-                toast.error("Something went wrong");
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        signIn("credentials", {
+            ...data,
+            redirect: false,
+        }).then((callback) => {
+            setLoading(false);
+
+            if (callback?.ok) {
+                toast.success("Logged in successfully");
+                router.refresh();
+                loginModal.onClose();
+            }
+            if (callback?.error) {
+                toast.error(callback.error);
+            }
+        });
     };
     const handleToggle = useCallback(()=> {
-        registerModal.onClose()
-        loginModal.onOpen()
+        loginModal.onClose()
+        registerModal.onOpen()
     },[loginModal, registerModal])
     const bodyContent = (
         <div className="flex flex-col gap-4">
-            <Heading title="Welcome to Airbnb" subtitle="Create an account" />
+            <Heading title="Welcome back" subtitle="Login to your account" />
             <Input
                 name="email"
                 label="Email"
@@ -65,14 +70,7 @@ export default function RegisterModal() {
                 errorMessage={errors.email?.message}
                 register={register}
             />
-            <Input
-                name="name"
-                label="Name"
-                disabled={isLoading}
-                placeholder=" "
-                errorMessage={errors.name?.message}
-                register={register}
-            />
+
             <Input
                 register={register}
                 name="password"
@@ -98,14 +96,17 @@ export default function RegisterModal() {
                 outline
                 label="Continue with github"
                 icon={AiFillGithub}
-                onClick={()=>signIn("github")}
+                onClick={()=> signIn("github")}
             />
             <div className="mt-4 font-light text-center text-neutral-500">
                 <div className="flex items-center justify-center gap-2">
-                    <div className="">Already have an account?</div>
+                    <div className="">First time using Airbnb?</div>
 
-                    <div onClick={handleToggle} className="cursor-pointer text-neutral-800 hover:underline">
-                        Log in
+                    <div
+                        onClick={handleToggle}
+                        className="cursor-pointer text-neutral-800 hover:underline"
+                    >
+                        Create an account
                     </div>
                 </div>
             </div>
@@ -114,10 +115,10 @@ export default function RegisterModal() {
     return (
         <Modal
             disabled={isLoading}
-            isOpen={registerModal.isOpen}
-            title="Register"
+            isOpen={loginModal.isOpen}
+            title="Login"
             actionLabel="Continue"
-            onClose={registerModal.onClose}
+            onClose={loginModal.onClose}
             onSubmit={handleSubmit(onSubmit)}
             body={bodyContent}
             footer={FooterContent}

@@ -53,7 +53,7 @@ const Modal: React.FC<ModalProps> = ({
     if (!isOpen) return null;
     return (
         <>
-            <div className="fixed inset-0 flex items-center overflow-x-hidden overflow-y-auto outline-none justify-content focus:outline-none bg-neutral-800/70">
+            <div className="fixed inset-0 flex items-center overflow-x-hidden overflow-y-auto outline-none justify-content focus:outline-none bg-neutral-800/70 z-[999]">
                 <div className="relative w-full h-full mx-auto my-6 md:w-4/6 lg:w-3/6 xl:w-2/5 lg:h-auto md:h-auto">
                     <div
                         className={`translate duration-300 h-full 
