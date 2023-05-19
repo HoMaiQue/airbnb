@@ -29,11 +29,11 @@ export default async function RootLayout({
                 <ClientOnly>
                     <ToasterProvider />
                     <LoginModal />
-                    <RentModal/>
+                    <RentModal />
                     <RegisterModal></RegisterModal>
                     <Navbar currentUser={currentUser}></Navbar>
                 </ClientOnly>
-                {children}
+                <div className="pb-20 pt-28">{children}</div>
             </body>
         </html>
     );

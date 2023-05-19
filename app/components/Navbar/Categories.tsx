@@ -100,7 +100,7 @@ export default function Categories() {
     const params = useSearchParams()
     const category = params?.get("category")
     const pathName = usePathname()
-    console.log(pathName)
+    
     const isMainPage = pathName === "/"
 
     if(!isMainPage) {
